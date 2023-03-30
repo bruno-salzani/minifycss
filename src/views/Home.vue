@@ -1,7 +1,7 @@
 <template>
 	<div class="max-w-4xl mx-auto mt-10">
 		<h1 class="text-2xl font-bold mb-4">Minify CSS</h1>
-		<div aria-label="File Upload Modal" class="relative p-8 flex flex-col h-full bg-white rounded-lg shadow-xl">
+		<div aria-label="File Upload Modal" class="relative p-6 flex flex-col h-full bg-white rounded-lg shadow-xl">
 			<label for="file-input" class="block font-bold">
 				<header
 					class="flex flex-col items-center justify-center py-12 border-2 border-gray-400 border-dashed rounded-lg cursor-pointer hover:bg-blue-50"
@@ -19,7 +19,7 @@
 				</header>
 			</label>
 
-			<input id="file-input" type="file" ref="fileInput" @change="onFileChange" class="hidden" />
+			<input id="file-input" type="file" accept=".css" ref="fileInput" @change="onFileChange" class="hidden" />
 
 			<div v-if="fileSize" class="mb-4 mt-6">
 				<div class="flex pb-4">
