@@ -1,7 +1,6 @@
 <template>
-	<div class="max-w-4xl mx-auto mt-10">
-		<h1 class="text-2xl font-bold mb-4">Minify CSS</h1>
-		<div aria-label="File Upload Modal" class="relative p-6 flex flex-col h-full bg-white rounded-lg shadow-xl">
+	<div class="max-w-4xl mx-auto">
+		<div aria-label="File Upload Modal" class="relative flex flex-col h-full">
 			<label for="file-input" class="block font-bold">
 				<header
 					class="flex flex-col items-center justify-center py-12 border-2 border-gray-400 border-dashed rounded-lg cursor-pointer hover:bg-blue-50"
@@ -57,6 +56,36 @@
 					<span class="font-semibold">Download</span>
 				</button>
 			</div>
+		</div>
+
+		<div class="container mx-auto py-8">
+			<h1 class="text-3xl font-bold mb-4">Por que Minificar Arquivos CSS?</h1>
+			<p class="mb-4">
+				Minificar arquivos CSS é uma técnica utilizada para reduzir o tamanho do arquivo, tornando-o mais leve e
+				otimizado para a web. Essa técnica é muito importante para sites e aplicações web que precisam ser
+				rápidos e eficientes.
+			</p>
+			<p class="mb-4">
+				Ao minificar um arquivo CSS, é possível remover espaços em branco, comentários e outras informações
+				desnecessárias que não interferem no funcionamento do arquivo. Isso pode resultar em uma redução de até
+				80% do tamanho do arquivo original, dependendo da quantidade de espaços em branco e comentários
+				existentes.
+			</p>
+			<p class="mb-4">
+				Além de tornar o arquivo mais leve, a minificação também pode melhorar a performance do site ou
+				aplicação web, uma vez que o arquivo minificado pode ser carregado mais rapidamente pelo navegador do
+				usuário.
+			</p>
+			<p class="mb-4">
+				Outra vantagem da minificação é a possibilidade de reduzir o consumo de dados do usuário, principalmente
+				em dispositivos móveis, onde o tráfego de dados pode ser mais caro ou limitado. Um arquivo CSS
+				minificado pode significar menos tempo de carregamento e menos dados consumidos pelo usuário.
+			</p>
+			<p class="mb-4">
+				Em resumo, a minificação de arquivos CSS é uma técnica simples e eficiente para melhorar a performance e
+				reduzir o tamanho de sites e aplicações web, trazendo benefícios tanto para os desenvolvedores quanto
+				para os usuários.
+			</p>
 		</div>
 	</div>
 </template>
