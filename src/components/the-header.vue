@@ -60,7 +60,7 @@
 				<div class="flex items-center justify-center flex-1 sm:items-stretch sm:justify-start">
 					<router-link to="/">
 						<div class="flex items-center flex-shrink-0 py-1 bg-blue-600 border rounded-md px-2.5">
-							<span class="text-3xl font-bold text-white">IgniLab</span>
+							<span class="text-3xl font-bold text-white">MinifyCSS</span>
 						</div>
 					</router-link>
 				</div>
