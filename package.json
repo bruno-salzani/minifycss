@@ -1,5 +1,9 @@
 {
+<<<<<<< HEAD
 	"name": "minifycss",
+=======
+	"name": "bin2dec",
+>>>>>>> 0307b09aca0d663b917437c65dc3d13e46dd3fd7
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
@@ -13,6 +17,7 @@
 		"apexcharts": "^3.26.0",
 		"core-js": "^3.6.5",
 		"file-saver": "^2.0.5",
+		"terser": "^5.16.8",
 		"vue": "^2.6.11",
 		"vue-apexcharts": "^1.6.1",
 		"vue-material-design-icons": "^4.11.0",
@@ -43,6 +48,7 @@
 		"sass": "^1.26.5",
 		"sass-loader": "^8.0.2",
 		"tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.1.0",
+		"uglify-js": "^3.17.4",
 		"vue-template-compiler": "^2.6.11"
 	},
 	"lint-staged": {
