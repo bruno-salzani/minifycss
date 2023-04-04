@@ -60,7 +60,7 @@
 				<div class="flex items-center justify-center flex-1 sm:items-stretch sm:justify-start">
 					<router-link to="/">
 						<div class="flex items-center flex-shrink-0 py-1 px-2.5">
-							<span class="text-2xl font-bold text-gray-700">Bin2Dec</span>
+							<span class="text-2xl font-bold text-gray-700">MinifyCSS</span>
 						</div>
 					</router-link>
 				</div>

@@ -1,138 +1,150 @@
 <template>
 	<div class="max-w-4xl mx-auto">
-		<div>
-			<ul class="flex border-b">
-				<li class="-mb-px mr-1">
-					<a
-						class="inline-block border-l border-t border-r rounded-t py-2 px-4 text-gray-700 font-semibold"
-						:class="{ 'bg-white text-black': activeTab === 'binaryToDecimal' }"
-						href="#"
-						@click="activeTab = 'binaryToDecimal'"
-						>Binário para Decimal</a
-					>
-				</li>
-				<li class="-mb-px mr-1">
-					<a
-						class="inline-block border-l border-t border-r rounded-t py-2 px-4 text-gray-700 font-semibold"
-						:class="{ 'bg-white text-black': activeTab === 'decimalToBinary' }"
-						href="#"
-						@click="activeTab = 'decimalToBinary'"
-						>Decimal para Binário</a
-					>
-				</li>
-			</ul>
-			<div class="p-8 bg-white shadow-md rounded-md">
-				<div v-show="activeTab === 'binaryToDecimal'">
-					<div class="flex mr-4 w-full" v-show="activeTab === 'binaryToDecimal'">
-						<fieldset class="relative z-0 w-full bg-white border border-gray-300 rounded-md">
-							<input
-								class="block w-full px-3 pt-4 pb-2 mt-0 bg-transparent appearance-none focus:outline-none focus:ring-0 focus:border-black"
-								type="text"
-								placeholder=" "
-								v-model="binary"
-							/>
-							<label class="absolute top-0 pl-4 text-lg text-gray-500 duration-300 pt-2.5 -z-1 origin-0">
-								Insira um número binário
-							</label>
-						</fieldset>
-						<button
-							class="px-4 ml-2 text-white bg-blue-500 rounded-md focus:outline-none"
-							@click="convertToDecimal"
+		<div aria-label="File Upload Modal" class="relative flex flex-col h-full">
+			<label for="file-input" class="block font-bold">
+				<header
+					class="flex flex-col items-center justify-center py-12 border-2 border-gray-400 border-dashed rounded-lg cursor-pointer hover:bg-blue-50"
+				>
+					<p class="flex flex-wrap justify-center mb-4 font-semibold text-gray-900">
+						<span class="text-gray-600 underline">Click here </span>
+						<span class="ml-1"> to select a file</span>
+					</p>
+					<svg class="text-gray-300 w-12" viewBox="0 0 24 24">
+						<path
+							fill="currentColor"
+							d="M14,13V17H10V13H7L12,8L17,13M19.35,10.03C18.67,6.59 15.64,4 12,4C9.11,4 6.6,5.64 5.35,8.03C2.34,8.36 0,10.9 0,14A6,6 0 0,0 6,20H19A5,5 0 0,0 24,15C24,12.36 21.95,10.22 19.35,10.03Z"
+						/>
+					</svg>
+				</header>
+			</label>
+
+			<input id="file-input" type="file" accept=".css" ref="fileInput" @change="onFileChange" class="hidden" />
+
+			<div v-if="fileSize" class="mb-4 mt-6">
+				<div class="flex pb-4">
+					<button class="" @click="selectFile"></button>
+					<div class="flex items-center">
+						<svg
+							class="h-8 w-8 text-black-500"
+							width="24"
+							height="24"
+							viewBox="0 0 24 24"
+							stroke-width="2"
+							stroke="currentColor"
+							fill="none"
+							stroke-linecap="round"
+							stroke-linejoin="round"
 						>
-							Converter
-						</button>
-					</div>
-					<div class="mt-4">
-						<p class="mb-2">O valor em decimal é:</p>
-
-						<input class="font-bold w-full outline-none" type="text" v-model="decimal" readonly />
-					</div>
-				</div>
-				<div v-show="activeTab === 'decimalToBinary'">
-					<div class="flex" v-show="activeTab === 'decimalToBinary'">
-						<fieldset class="relative z-0 w-full bg-white border border-gray-300 rounded-md">
-							<input
-								class="block w-full px-3 pt-4 pb-2 mt-0 bg-transparent appearance-none focus:outline-none focus:ring-0 focus:border-black"
-								type="text"
-								placeholder=" "
-								v-model="decimal"
+							<path stroke="none" d="M0 0h24v24H0z" />
+							<path
+								d="M15 7l-6.5 6.5a1.5 1.5 0 0 0 3 3l6.5 -6.5a3 3 0 0 0 -6 -6l-6.5 6.5a4.5 4.5 0 0 0 9 9 l6.5 -6.5"
 							/>
-							<label class="absolute top-0 pl-4 text-lg text-gray-500 duration-300 pt-2.5 -z-1 origin-0">
-								Insira um número decimal
-							</label>
-						</fieldset>
-
-						<button
-							class="px-4 ml-2 text-white bg-blue-500 rounded-md focus:outline-none"
-							@click="convertToBinary"
-						>
-							Converter
-						</button>
-					</div>
-					<div class="mt-4">
-						<p class="mb-2">O valor em binário é:</p>
-
-						<input class="font-bold outline-none w-full" type="text" v-model="binary" readonly />
+						</svg>
+						<div class="flex flex-col pl-2">
+							<span class="text-sm font-bold text-gray-700 leading-4">{{ fileName }}</span>
+							<p class="text-xs leading-4">Original Weight: {{ fileSize }}</p>
+							<p class="text-xs leading-4">Minified Weight: {{ minifiedFileSize }}</p>
+						</div>
 					</div>
 				</div>
 			</div>
+			<div v-if="minifiedData">
+				<button
+					class="flex items-center justify-center w-full px-4 py-2 text-white bg-blue-500 rounded-md shadow focus:outline-none"
+					@click="downloadMinifiedFile"
+				>
+					<span class="font-semibold">Download</span>
+				</button>
+			</div>
+		</div>
+
+		<div class="container mx-auto py-8">
+			<h1 class="text-3xl font-bold mb-4">Why Minify CSS Files?</h1>
+			<p class="mb-4">
+				Minifying CSS files is a technique used to reduce file size, making it lighter and optimized for the
+				web. This technique is crucial for websites and web applications that need to be fast and efficient.
+			</p>
+			<p class="mb-4">
+				By minifying a CSS file, it is possible to remove whitespace, comments, and other unnecessary
+				information that does not affect the file's functionality. This can result in a reduction of up to 80%
+				of the original file size, depending on the amount of whitespace and comments present.
+			</p>
+			<p class="mb-4">
+				In addition to making the file lighter, minification can also improve the performance of the website or
+				web application, as the minified file can be loaded more quickly by the user's browser.
+			</p>
+			<p class="mb-4">
+				Another advantage of minification is the possibility of reducing user data consumption, especially on
+				mobile devices, where data traffic may be more expensive or limited. A minified CSS file can mean less
+				loading time and less data consumed by the user.
+			</p>
+			<p class="mb-4">
+				In summary, CSS file minification is a simple and efficient technique for improving the performance and
+				reducing the size of websites and web applications, bringing benefits to both developers and users.
+			</p>
 		</div>
 	</div>
 </template>
 
 <script>
+	import cleanCSS from 'clean-css';
+
 	export default {
 		data() {
 			return {
-				activeTab: 'binaryToDecimal',
-				binary: '',
-				decimal: '',
+				fileName: '',
+				fileSize: null,
+				minifiedData: null,
+				minifiedFileSize: null,
 			};
 		},
 		methods: {
-			convertToDecimal() {
-				const binary = this.binary;
-				const decimal = parseInt(binary, 2);
-				this.decimal = isNaN(decimal) ? '' : decimal;
+			selectFile() {
+				this.$refs.fileInput.click();
 			},
-			convertToBinary() {
-				const decimal = this.decimal;
-				const binary = (decimal >>> 0).toString(2);
-				this.binary = isNaN(binary) ? '' : binary;
+			onFileChange(e) {
+				const file = e.target.files[0];
+				this.fileName = file.name;
+				this.fileSize = this.formatSizeUnits(file.size);
+
+				const reader = new FileReader();
+				reader.onload = () => {
+					const cssData = reader.result;
+					this.minifyCSS(cssData);
+				};
+				reader.readAsText(file);
+			},
+			minifyCSS(cssData) {
+				const minified = new cleanCSS().minify(cssData);
+				this.minifiedData = minified.styles;
+				this.minifiedFileSize = this.formatSizeUnits(minified.stats.minifiedSize);
+			},
+			downloadMinifiedFile() {
+				const blob = new Blob([this.minifiedData], { type: 'text/css' });
+				const url = URL.createObjectURL(blob);
+				const link = document.createElement('a');
+				link.href = url;
+				link.download = 'minified.css';
+				link.click();
+			},
+			formatSizeUnits(bytes) {
+				if (bytes >= 1073741824) {
+					return (bytes / 1073741824).toFixed(2) + ' GB';
+				}
+				if (bytes >= 1048576) {
+					return (bytes / 1048576).toFixed(2) + ' MB';
+				}
+				if (bytes >= 1024) {
+					return (bytes / 1024).toFixed(2) + ' KB';
+				}
+				if (bytes > 1) {
+					return bytes + ' bytes';
+				}
+				if (bytes === 1) {
+					return bytes + ' byte';
+				}
+				return '0 bytes';
 			},
 		},
 	};
 </script>
-<style>
-	.-z-1 {
-		z-index: -1;
-	}
-
-	.origin-0 {
-		transform-origin: 0%;
-	}
-
-	input:focus ~ label,
-	input:not(:placeholder-shown) ~ label,
-	textarea:focus ~ label,
-	textarea:not(:placeholder-shown) ~ label,
-	select:focus ~ label,
-	select:not([value='']):valid ~ label {
-		/* @apply transform; scale-75; -translate-y-6; */
-		--tw-translate-x: 0;
-		--tw-translate-y: 0;
-		--tw-rotate: 0;
-		--tw-skew-x: 0;
-		--tw-skew-y: 0;
-		transform: translateX(var(--tw-translate-x)) translateY(var(--tw-translate-y)) rotate(var(--tw-rotate))
-			skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-		--tw-scale-x: 0.75;
-		--tw-scale-y: 0.75;
-		--tw-translate-y: -0.65rem;
-	}
-
-	input:focus ~ fieldset,
-	select:focus ~ fieldset {
-		border: #0ea5e9;
-	}
-</style>

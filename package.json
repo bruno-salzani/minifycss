@@ -1,9 +1,5 @@
 {
-<<<<<<< HEAD
-	"name": "minifycss",
-=======
-	"name": "bin2dec",
->>>>>>> 0307b09aca0d663b917437c65dc3d13e46dd3fd7
+	"name": "MinifyCSS",
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
