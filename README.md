@@ -7,4 +7,4 @@ Este projeto tem como objetivo estudar a criação de websites utilizando inteli
 Para acessar a demonstração do projeto <a href="https://minifycss.netlify.app/" target="_blank">Clique aqui</a>
 
 
-![GitHub Logo](/src/assets/img/preview.png)
+![GitHub Logo](/src/assets/img/preview2.png)
