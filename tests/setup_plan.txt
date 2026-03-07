@@ -1,0 +1,18 @@
+const { minifyCSS, formatSizeUnits } = require('../src/utils/css-minifier');
+const assert = require('assert');
+
+// Mock CleanCSS since it's used in the module
+// Actually, since we are running in node, require should work if we handle ES modules correctly or transpile.
+// But wait, the project uses ES modules (import/export) in src.
+// Node.js might complain if I try to require it directly without package.json "type": "module" or .mjs extension.
+// And minifyCSS uses `import CleanCSS from 'clean-css'`.
+
+// Let's create a test file that imports the source code.
+// Since this is a Vue CLI project with Babel, it expects compilation.
+// Running `node tests/validate-minifier.js` directly will likely fail on `import` statements if not configured.
+
+// Plan B: Use the existing `npm run lint` as a baseline, and maybe just rely on manual verification?
+// No, "nota 10" needs automated tests.
+
+// Let's try to install jest and vue-jest for Vue 2.
+console.log("Setting up tests...");

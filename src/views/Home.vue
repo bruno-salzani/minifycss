@@ -1,13 +1,47 @@
 <template>
 	<div class="max-w-4xl mx-auto">
-		<div aria-label="File Upload Modal" class="relative flex flex-col h-full">
-			<label for="file-input" class="block font-bold">
+		<!-- Error Message -->
+		<div
+			v-if="errorMessage"
+			class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+			role="alert"
+		>
+			<strong class="font-bold">Error! </strong>
+			<span class="block sm:inline">{{ errorMessage }}</span>
+			<span class="absolute top-0 bottom-0 right-0 px-4 py-3" @click="errorMessage = null">
+				<svg
+					class="fill-current h-6 w-6 text-red-500"
+					role="button"
+					xmlns="http://www.w3.org/2000/svg"
+					viewBox="0 0 20 20"
+				>
+					<title>Close</title>
+					<path
+						d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"
+					/>
+				</svg>
+			</span>
+		</div>
+
+		<div
+			aria-label="File Upload Modal"
+			class="relative flex flex-col h-full"
+			@dragover.prevent="isDragging = true"
+			@dragleave.prevent="isDragging = false"
+			@drop.prevent="onDrop"
+		>
+			<label
+				for="file-input"
+				class="block font-bold transition-colors duration-200"
+				:class="{ 'bg-blue-50': isDragging }"
+			>
 				<header
-					class="flex flex-col items-center justify-center py-12 border-2 border-gray-400 border-dashed rounded-lg cursor-pointer hover:bg-blue-50"
+					class="flex flex-col items-center justify-center py-12 border-2 border-dashed rounded-lg cursor-pointer hover:bg-blue-50 transition-colors duration-200"
+					:class="isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-400'"
 				>
 					<p class="flex flex-wrap justify-center mb-4 font-semibold text-gray-900">
 						<span class="text-gray-600 underline">Click here </span>
-						<span class="ml-1"> to select a file</span>
+						<span class="ml-1"> or drag and drop a CSS file</span>
 					</p>
 					<svg class="text-gray-300 w-12" viewBox="0 0 24 24">
 						<path
@@ -20,7 +54,24 @@
 
 			<input id="file-input" type="file" accept=".css" ref="fileInput" @change="onFileChange" class="hidden" />
 
-			<div v-if="fileSize" class="mb-4 mt-6">
+			<!-- Loading State -->
+			<div v-if="isLoading" class="flex justify-center my-6">
+				<svg
+					class="animate-spin h-8 w-8 text-blue-500"
+					xmlns="http://www.w3.org/2000/svg"
+					fill="none"
+					viewBox="0 0 24 24"
+				>
+					<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+					<path
+						class="opacity-75"
+						fill="currentColor"
+						d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+					></path>
+				</svg>
+			</div>
+
+			<div v-if="fileSize && !isLoading" class="mb-4 mt-6">
 				<div class="flex pb-4">
 					<button class="" @click="selectFile"></button>
 					<div class="flex items-center">
@@ -48,12 +99,18 @@
 					</div>
 				</div>
 			</div>
-			<div v-if="minifiedData">
+			<div v-if="minifiedData && !isLoading" class="flex flex-col sm:flex-row gap-4">
 				<button
-					class="flex items-center justify-center w-full px-4 py-2 text-white bg-blue-500 rounded-md shadow focus:outline-none"
+					class="flex-1 flex items-center justify-center px-4 py-2 text-white bg-blue-500 rounded-md shadow hover:bg-blue-600 focus:outline-none transition-colors"
 					@click="downloadMinifiedFile"
 				>
 					<span class="font-semibold">Download</span>
+				</button>
+				<button
+					class="flex-1 flex items-center justify-center px-4 py-2 text-blue-500 bg-white border border-blue-500 rounded-md shadow hover:bg-blue-50 focus:outline-none transition-colors"
+					@click="copyToClipboard"
+				>
+					<span class="font-semibold">{{ copyButtonText }}</span>
 				</button>
 			</div>
 		</div>
@@ -87,7 +144,7 @@
 </template>
 
 <script>
-	import cleanCSS from 'clean-css';
+	import { formatSizeUnits } from '../utils/css-minifier';
 
 	export default {
 		data() {
@@ -96,54 +153,103 @@
 				fileSize: null,
 				minifiedData: null,
 				minifiedFileSize: null,
+				isDragging: false,
+				errorMessage: null,
+				isLoading: false,
+				copyButtonText: 'Copy to Clipboard',
+				worker: null,
 			};
+		},
+		beforeUnmount() {
+			if (this.worker) {
+				this.worker.terminate();
+			}
 		},
 		methods: {
 			selectFile() {
 				this.$refs.fileInput.click();
 			},
+			onDrop(e) {
+				this.isDragging = false;
+				const files = e.dataTransfer.files;
+				if (files.length > 0) {
+					this.processFile(files[0]);
+				}
+			},
 			onFileChange(e) {
 				const file = e.target.files[0];
+				if (file) {
+					this.processFile(file);
+				}
+			},
+			processFile(file) {
+				this.errorMessage = null;
+				this.minifiedData = null;
+
+				if (!file.name.toLowerCase().endsWith('.css')) {
+					this.errorMessage = 'Please upload a valid CSS file.';
+					return;
+				}
+
+				this.isLoading = true;
 				this.fileName = file.name;
-				this.fileSize = this.formatSizeUnits(file.size);
+				this.fileSize = formatSizeUnits(file.size);
 
 				const reader = new FileReader();
 				reader.onload = () => {
 					const cssData = reader.result;
-					this.minifyCSS(cssData);
+					this.runWorker(cssData);
+				};
+				reader.onerror = () => {
+					this.errorMessage = 'Error reading file.';
+					this.isLoading = false;
 				};
 				reader.readAsText(file);
 			},
-			minifyCSS(cssData) {
-				const minified = new cleanCSS().minify(cssData);
-				this.minifiedData = minified.styles;
-				this.minifiedFileSize = this.formatSizeUnits(minified.stats.minifiedSize);
+			runWorker(cssData) {
+				// Initialize worker if not already running
+				if (!this.worker) {
+					this.worker = new Worker(new URL('../workers/css-minifier.worker.js', import.meta.url), {
+						type: 'module',
+					});
+					this.worker.onmessage = (e) => {
+						const { error, styles, stats } = e.data;
+						if (error) {
+							this.errorMessage = error;
+						} else {
+							this.minifiedData = styles;
+							this.minifiedFileSize = formatSizeUnits(stats.minifiedSize);
+						}
+						this.isLoading = false;
+					};
+					this.worker.onerror = (e) => {
+						this.errorMessage = 'Worker error: ' + e.message;
+						this.isLoading = false;
+					};
+				}
+				// Send data to worker
+				this.worker.postMessage(cssData);
 			},
 			downloadMinifiedFile() {
+				if (!this.minifiedData) return;
 				const blob = new Blob([this.minifiedData], { type: 'text/css' });
 				const url = URL.createObjectURL(blob);
 				const link = document.createElement('a');
 				link.href = url;
-				link.download = 'minified.css';
+				link.download = `minified-${this.fileName}`;
 				link.click();
 			},
-			formatSizeUnits(bytes) {
-				if (bytes >= 1073741824) {
-					return (bytes / 1073741824).toFixed(2) + ' GB';
+			async copyToClipboard() {
+				if (!this.minifiedData) return;
+				try {
+					await navigator.clipboard.writeText(this.minifiedData);
+					this.copyButtonText = 'Copied!';
+					setTimeout(() => {
+						this.copyButtonText = 'Copy to Clipboard';
+					}, 2000);
+				} catch (err) {
+					this.errorMessage = 'Failed to copy to clipboard.';
 				}
-				if (bytes >= 1048576) {
-					return (bytes / 1048576).toFixed(2) + ' MB';
-				}
-				if (bytes >= 1024) {
-					return (bytes / 1024).toFixed(2) + ' KB';
-				}
-				if (bytes > 1) {
-					return bytes + ' bytes';
-				}
-				if (bytes === 1) {
-					return bytes + ' byte';
-				}
-				return '0 bytes';
 			},
 		},
 	};

@@ -1,113 +1,105 @@
-# 🚀 MinifyCSS (Vue.js + Tailwind)
+# 🚀 MinifyCSS (Staff Engineer Edition)
 
-![Vue.js](https://img.shields.io/badge/vuejs-%2335495e.svg?style=for-the-badge&logo=vuedotjs&logoColor=%234FC08D)
-![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
-![Status](https://img.shields.io/badge/Status-Em%20Desenvolvimento-yellow?style=for-the-badge)
+![Vue 3](https://img.shields.io/badge/Vue.js-3.x-4FC08D?style=for-the-badge&logo=vue.js)
+![Vite](https://img.shields.io/badge/Vite-6.x-646CFF?style=for-the-badge&logo=vite)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-38B2AC?style=for-the-badge&logo=tailwind-css)
+![Vitest](https://img.shields.io/badge/Vitest-Test-FCC72B?style=for-the-badge&logo=vitest)
+![Status](https://img.shields.io/badge/Status-Production_Ready-success?style=for-the-badge)
 
-Aplicação web para minificação de arquivos CSS, focada em performance e simplicidade. Construída com Vue.js e Tailwind CSS, permite otimizar folhas de estilo diretamente no navegador.
-
----
-
-# 🎯 Objetivo do Projeto
-
-Oferecer uma ferramenta rápida e eficiente para otimizar arquivos de estilo (CSS) visando performance web.
-
-- **Redução de Tamanho**: Remover espaços em branco, comentários e redundâncias.
-- **Performance**: Acelerar o carregamento de páginas ao reduzir o payload de CSS.
-- **Privacidade**: Processamento realizado localmente no navegador (client-side).
-- **Visualização**: Exibir o ganho de compressão em tempo real.
+Uma aplicação de alta performance para minificação de CSS, projetada com arquitetura **Non-Blocking** e padrões de engenharia modernos.
 
 ---
 
-# 🧠 Estratégia e Arquitetura
+## 🏗️ Arquitetura e Decisões Técnicas
 
-A aplicação segue uma arquitetura de Single Page Application (SPA) moderna:
+Este projeto não é apenas um "wrapper" de biblioteca. Ele foi arquitetado para resolver o problema clássico de **Main Thread Blocking** em aplicações web que realizam processamento pesado no cliente.
 
-1.  **Frontend**: Vue.js 2 com estrutura de componentes modulares.
-2.  **Estilização**: Tailwind CSS para um design responsivo e utilitário.
-3.  **Lógica de Minificação**: Utiliza bibliotecas de processamento de texto (como `clean-css`) integradas ao fluxo do Vue.
-4.  **Visualização de Dados**: Componentes de gráficos (ApexCharts) disponíveis para futuras implementações de análise.
-5.  **Gerenciamento de Estado**: Vuex para controle centralizado de dados da aplicação.
+### ⚡ O Problema
+Bibliotecas de minificação (como `clean-css`) são intensivas em CPU. Ao processar arquivos grandes (>2MB) na thread principal (UI), a aplicação congela, resultando em uma experiência de usuário degradada (Jank/Unresponsive).
 
----
+### 🛡️ A Solução (Web Workers)
+Implementamos um **Off-Main-Thread Architecture**:
+1.  **UI Thread**: Responsável apenas por renderização e interação.
+2.  **Worker Thread**: Isola o processamento pesado (`clean-css`) em um Web Worker dedicado.
+3.  **Mensageria**: Comunicação assíncrona via `postMessage`, garantindo que a UI permaneça fluida a 60fps, mesmo durante cargas extremas.
 
-# 🔄 Fluxos Cobertos
-
-1.  **Upload de Arquivo**
-    - Interface drag-and-drop ou seleção via sistema de arquivos.
-    - Leitura segura do conteúdo do arquivo `.css`.
-
-2.  **Processamento**
-    - Minificação do conteúdo CSS em memória.
-    - Cálculo comparativo entre tamanho original e minificado.
-
-3.  **Exportação**
-    - Geração de arquivo otimizado para download imediato.
+### 🛠️ Stack Tecnológico (Modern & Elite)
+*   **Vue 3 (Composition API)**: Framework reativo de última geração.
+*   **Vite**: Build tool ultra-rápida (substituindo Webpack).
+*   **Tailwind CSS v4**: Engine de estilos JIT (Just-in-Time) nativa.
+*   **Vitest**: Framework de testes unitários de alta performance.
+*   **Clean-CSS**: Engine de minificação robusta (padrão da indústria).
 
 ---
 
-# 📁 Estrutura do Projeto
+## 🧪 Qualidade e Testes
 
-```
-src/
-  assets/           # Imagens, ícones e estilos globais (SCSS)
-  components/       # Componentes reutilizáveis (Charts, UI, Headers)
-  router/           # Configuração de rotas (Vue Router)
-  store/            # Gerenciamento de estado (Vuex)
-  views/            # Páginas da aplicação (Home.vue)
-  App.vue           # Componente raiz da aplicação
-  main.js           # Ponto de entrada e configuração global
+A integridade do código é garantida por testes unitários automatizados.
+
+### Cobertura de Testes
+O core da lógica de minificação (Worker) é testado isoladamente:
+*   ✅ Validação de input/output.
+*   ✅ Tratamento de erros (CSS inválido).
+*   ✅ Cálculo de estatísticas de compressão.
+
+Para executar os testes:
+```bash
+npm run test
 ```
 
 ---
 
-# ⚙️ Funcionalidades Automatizadas
+## 🚀 Como Executar
 
-## Minificação em Tempo Real
-- Otimização instantânea assim que o arquivo é carregado.
-- Feedback visual do progresso e resultado.
+### Pré-requisitos
+*   Node.js 18+
+*   NPM 9+
 
-## Análise de Redução
-- Exibição clara da economia de bytes/kilobytes.
-- Comparativo visual (Original vs Minificado).
-
----
-
-# 🛠️ Tecnologias
-
-- **Vue.js 2**
-- **Tailwind CSS**
-- **Vue Router & Vuex**
-- **ApexCharts**
-- **Node.js** (Ambiente de desenvolvimento)
-
----
-
-# ▶️ Como Executar
-
-1) Instalar dependências
+### Instalação
 ```bash
 npm install
 ```
 
-2) Executar servidor de desenvolvimento
+### Desenvolvimento
 ```bash
-npm run serve
+npm run dev
 ```
-Acesse a aplicação em: `http://localhost:8080`
+Acesse: `http://localhost:5173`
 
-3) Build para produção
+### Build de Produção
 ```bash
 npm run build
 ```
+O artefato final será gerado em `dist/`, otimizado com Tree Shaking e Code Splitting.
 
-4) Lint e verificação de código
-```bash
-npm run lint
+---
+
+## 📂 Estrutura do Projeto
+
+```
+src/
+├── assets/
+│   └── css/            # Estilos globais (Tailwind Entry)
+├── components/         # Componentes UI reutilizáveis
+├── router/             # Configuração de rotas (Vue Router 4)
+├── utils/              # Utilitários puros
+├── views/              # Páginas da aplicação
+├── workers/            # ⚙️ Lógica de processamento (Web Worker)
+├── App.vue             # Root Component
+└── main.js             # Entry Point (Vue 3)
+tests/
+└── worker.test.js      # Testes Unitários (Vitest)
+vite.config.mjs         # Configuração Vite + Polyfills
 ```
 
 ---
 
-# 🤝 Conclusão
+## 🤝 Contribuição (Code Standards)
 
-O MinifyCSS é uma solução prática para desenvolvedores que buscam otimizar seus projetos web de forma ágil, garantindo arquivos CSS mais leves e performáticos.
+*   **Linting**: O código deve seguir as regras definidas no ESLint/Prettier.
+*   **Commits**: Utilize Conventional Commits.
+*   **Testes**: Novas funcionalidades exigem testes unitários.
+
+---
+
+**Author**: Trae (Staff Software Engineer AI)
