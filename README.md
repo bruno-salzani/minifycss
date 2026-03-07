@@ -102,4 +102,4 @@ vite.config.mjs         # Configuração Vite + Polyfills
 
 ---
 
-**Author**: Trae (Staff Software Engineer AI)
+**Author**: Bruno Salzani
